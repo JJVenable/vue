@@ -2,12 +2,19 @@
   <div id="app">
     <main>
       <div class="search-box">
-        <input type="text" class="search-bar" placeholder="Search..." />
+        <input 
+        type="text" 
+        class="search-bar" 
+        placeholder="Search..." 
+        v-model="query"
+        @keypress="fetchWeather"
+        />
+        
       </div>
 
-      <div class="weather-wrap">
+      <div class="weather-wrap" v-if="typeof weather.main != 'undefined'">
         <div class="location-box">
-          <div class="location">Chattanooga, TN</div>
+          <div class="location">{{weather.name}}, {{weather.sys.country}} </div>
           <div class="date">Monday June 6 2022</div>
         </div>
         <div class="weather-box">
@@ -26,7 +33,23 @@ export default {
   name: 'App',
   data () {
     return {
-      api_key: '95fbe7def10118cb39bbb1dd372b35f9'
+      api_key: '95fbe7def10118cb39bbb1dd372b35f9',
+      url_base: "https://api.openweathermap.org/data/2.5/",
+      query: '',
+      weather: {}
+    }
+  },
+  methods: {
+    fetchWeather (e) {
+      if (e.key == 'Enter') {
+        fetch(`${this.url_base}forecast?q=${this.query}&units=metric&APPID=${this.api.key}`)
+          .then(response => {
+            return response.json();
+          }).then(this.setResults);
+      }
+    },
+    setResults(results) {
+      this.weather = results;
     }
   }
 }
